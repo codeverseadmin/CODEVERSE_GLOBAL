@@ -1,87 +1,138 @@
+'use client';
+
+import { useState } from 'react';
+import { Search, FileCode2, Palette, Terminal, Rocket } from 'lucide-react';
+
 const STEPS = [
   {
     number: '01',
     title: 'Discover',
+    label: 'Technical Discovery',
+    icon: Search,
     description:
-      'We take time to understand your business, your users, your objectives, and your constraints before proposing anything.',
+      'We unpack your business objectives, technical constraints, user expectations, and performance targets before writing a line of code.',
+    deliverable: 'Architecture Matrix & Scope Brief',
   },
   {
     number: '02',
     title: 'Define',
+    label: 'Specification Contract',
+    icon: FileCode2,
     description:
-      'We agree on scope, deliverables, budget, and milestones so that expectations are clear from the start.',
+      'We establish firm milestone commitments, technical specifications, and API data contracts so there are no surprises or moving targets.',
+    deliverable: 'Milestone Roadmap & API Contract',
   },
   {
     number: '03',
     title: 'Design',
+    label: 'Interface & Motion',
+    icon: Palette,
     description:
-      'We develop the visual direction and user experience — establishing how the product looks, feels, and behaves.',
+      'We craft the visual direction, responsive grids, typography hierarchies, and interaction choreographies tailored to your brand identity.',
+    deliverable: 'Figma High-Fidelity & Design Tokens',
   },
   {
     number: '04',
     title: 'Develop',
+    label: 'Production Build',
+    icon: Terminal,
     description:
-      'We implement, test, and refine — building the solution with care for quality, performance, and correctness.',
+      'We engineer the system with clean Next.js/React code, strict TypeScript types, optimized assets, and comprehensive testing suites.',
+    deliverable: 'Type-Safe Codebase & Automated Tests',
   },
   {
     number: '05',
     title: 'Deliver',
+    label: 'Deploy & Verify',
+    icon: Rocket,
     description:
-      'We deploy, hand over, and provide the support agreed in scope — making sure you can move forward with confidence.',
+      'We execute zero-downtime production deployments, configure edge caching and security headers, and verify end-to-end functionality.',
+    deliverable: 'Vercel Edge Launch & Handover Docs',
   },
 ];
 
 export default function Process() {
+  const [activeStep, setActiveStep] = useState(0);
+
   return (
     <section
       aria-labelledby="process-heading"
-      className="section-padding"
+      className="section-padding bg-[#030306] border-t border-white/[0.08] relative overflow-hidden"
     >
-      <div className="container-xl">
-        <div className="mb-14">
-          <p className="text-label text-[var(--color-violet-light)] mb-4">How We Work</p>
-          <h2 id="process-heading" className="text-display-lg text-[var(--color-text-primary)] max-w-xl">
-            A process built around{' '}
-            <em className="not-italic gradient-text-violet">clarity.</em>
-          </h2>
+      <div className="container-xl relative z-10">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-950/30 border border-violet-500/20 text-xs font-mono text-violet-300 mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+              <span>DELIVERY METHODOLOGY &bull; 5 PHASES</span>
+            </div>
+            <h2 id="process-heading" className="text-display-lg text-[var(--color-text-primary)]">
+              A process engineered for{' '}
+              <em className="not-italic font-serif italic text-transparent bg-clip-text bg-gradient-to-r from-violet-300 via-cyan-200 to-emerald-300">
+                absolute clarity.
+              </em>
+            </h2>
+            <p className="text-base text-[var(--color-text-secondary)] max-w-xl mt-3 leading-relaxed font-light">
+              We eliminate ambiguity through structured milestones, transparent communication, and
+              regular testable deliverables at each phase of engagement.
+            </p>
+          </div>
         </div>
 
-        {/* Steps — horizontal timeline on desktop */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 md:gap-4">
-          {STEPS.map((step, i) => (
-            <div key={step.number} className="flex flex-col gap-4 group">
-              {/* Connector line + step number */}
-              <div className="flex items-center gap-3 md:flex-col md:items-start md:gap-0">
-                <div className="flex items-center w-full md:flex-col md:items-start">
-                  <div
-                    className="w-10 h-10 md:w-8 md:h-8 rounded-full flex items-center justify-center border border-[var(--color-violet)]/40 bg-[var(--color-violet)]/10 shrink-0"
-                    aria-hidden="true"
-                  >
-                    <span className="text-xs font-bold text-[var(--color-violet-light)]">
-                      {step.number}
+        {/* Interactive Step Explorer */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          {STEPS.map((step, i) => {
+            const isCurrent = activeStep === i;
+            const Icon = step.icon;
+
+            return (
+              <div
+                key={step.number}
+                onMouseEnter={() => setActiveStep(i)}
+                onClick={() => setActiveStep(i)}
+                className={`group cursor-pointer p-6 rounded-2xl border transition-all duration-300 flex flex-col justify-between ${
+                  isCurrent
+                    ? 'bg-white/[0.05] border-violet-500/40 shadow-xl shadow-violet-950/20'
+                    : 'bg-white/[0.015] border-white/[0.06] hover:bg-white/[0.03]'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span
+                      className={`text-xs font-mono font-bold transition-colors ${
+                        isCurrent ? 'text-violet-300' : 'text-white/40'
+                      }`}
+                    >
+                      PHASE {step.number}
                     </span>
-                  </div>
-                  {/* Connector */}
-                  {i < STEPS.length - 1 && (
                     <div
-                      className="hidden md:block h-px flex-1 mx-3"
-                      style={{ background: 'linear-gradient(90deg, rgba(139,92,246,0.4) 0%, rgba(139,92,246,0.05) 100%)' }}
-                      aria-hidden="true"
-                    />
-                  )}
+                      className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+                        isCurrent
+                          ? 'bg-violet-500/20 text-violet-300'
+                          : 'bg-white/[0.03] text-white/40'
+                      }`}
+                    >
+                      <Icon size={14} />
+                    </div>
+                  </div>
+
+                  <h3 className="text-base font-semibold text-white mb-2">
+                    {step.title}
+                  </h3>
+
+                  <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed mb-4 font-light">
+                    {step.description}
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-white/[0.06]">
+                  <span className="text-[10px] font-mono text-cyan-300/80 block uppercase tracking-wider">
+                    {step.deliverable}
+                  </span>
                 </div>
               </div>
-
-              <div className="flex flex-col gap-2 mt-2">
-                <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
-                  {step.title}
-                </h3>
-                <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
-                  {step.description}
-                </p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

@@ -15,9 +15,7 @@
 | **RISK-03** | Architecture | Low | Low | Single-Instance In-Memory Rate Limiting Under Auto-Scale | **ACCEPTED** |
 | **RISK-04** | Security | Low | Low | Content Security Policy Retention of `'unsafe-inline'` for SSG | **ACCEPTED** |
 | **RISK-05** | Accessibility| Low | Very Low | Manual Screen-Reader Hardware Testing Pending Physical Device Pass | **ACCEPTED** |
-
 ---
-
 ## 2. Detailed Risk Analysis & Compensating Controls
 
 ### RISK-01: Transitive Dev-Dependency Vulnerability in `braces`

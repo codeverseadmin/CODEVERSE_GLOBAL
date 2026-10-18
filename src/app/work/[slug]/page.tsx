@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import { getProjectBySlug, getAllProjectSlugs } from '@/lib/data/projects';
 import { buildMetadata } from '@/lib/utils/metadata';
 import { StatusBadge } from '@/components/ui/Badge';
+import ProjectVisualMockup from '@/components/work/ProjectVisualMockup';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -75,27 +76,14 @@ export default async function ProjectPage({ params }: Props) {
         </div>
       </section>
 
-      {/* Cover */}
+      {/* Cover Visual Preview */}
       <div className="container-xl mb-16">
-        <div
-          className="aspect-video rounded-2xl bg-[var(--color-surface-3)] border border-[var(--color-border)] flex items-center justify-center"
-          role="img"
-          aria-label={project.cover.alt}
-        >
-          <div className="flex flex-col items-center gap-4">
-            <div
-              className="w-20 h-20 rounded-2xl flex items-center justify-center"
-              style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)' }}
-              aria-hidden="true"
-            >
-              <span className="text-4xl font-bold text-[var(--color-violet-light)]">
-                {project.title.charAt(0)}
-              </span>
-            </div>
-            <span className="text-sm text-[var(--color-text-muted)]">
-              Project imagery — to be added
-            </span>
-          </div>
+        <div className="max-w-4xl mx-auto rounded-3xl overflow-hidden border border-white/[0.1] shadow-2xl p-2 bg-[#06060A]">
+          <ProjectVisualMockup
+            slug={project.slug}
+            title={project.title}
+            className="min-h-[340px] md:min-h-[460px]"
+          />
         </div>
       </div>
 
