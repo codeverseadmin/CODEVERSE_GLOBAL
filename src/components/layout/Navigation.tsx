@@ -153,12 +153,10 @@ export default function Navigation() {
           </span>
         </Link>
 
-        {/* Live Studio Telemetry Capsule (Center) */}
-        <div className="hidden xl:flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.06] text-[11px] font-mono text-white/60">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span>STUDIO ONLINE</span>
-          <span className="text-white/20">|</span>
-          <span className="text-white/40">23.8° N · 90.4° E</span>
+        {/* Live Studio Status Indicator (Center) */}
+        <div className="hidden xl:flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-[11px] font-mono text-white/70">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <span>STUDIO: ACCEPTING COMMISSIONS</span>
         </div>
 
         {/* Desktop Navigation Links */}
