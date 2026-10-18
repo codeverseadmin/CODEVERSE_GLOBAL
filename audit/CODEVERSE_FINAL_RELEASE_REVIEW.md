@@ -209,18 +209,123 @@ npm run build
 # - Metadata: Canonical https://codeverse.digital, Organization & WebSite JSON-LD
 ```
 
+```
+
 ---
 
-## 8. Final Recommendation
+## 8. Formal Issue Classification (BLOCKER, HIGH, MEDIUM, LOW, INFORMATIONAL)
 
-### Recommendation: **NO-GO** (For Immediate Public Commercial Traffic)
+Each outstanding or observed issue is classified below with its impact, evidence, recommended action, and whether it prevents Vercel Staging or Public Launch.
 
-**Engineering Justification**:
-While all software engineering fixes, rate limiting protections, CSP hardening, accessibility ratios, and test suites are code-complete and locally verified (**PASS**), one critical business requirement remains unresolved:
+### 8.1 BLOCKER Issues
 
-* **Real Transactional Email Delivery (FUNC-01)** is blocked pending founder configuration of production Resend credentials and domain DNS records (SPF, DKIM, DMARC) on `codeverse.digital`. 
+#### ISSUE-01: Live Production Email Credentials & Domain DNS Unconfigured
+* **Severity**: **BLOCKER** (For Public Launch) / **NON-BLOCKING** (For Vercel Staging)
+* **Impact**: Submitting project enquiries via `/start-a-project` safely returns `503 Service Unavailable` with direct contact instructions (`hello@codeverse.digital`) rather than dispatching real transactional emails.
+* **Evidence**: `process.env.RESEND_API_KEY` is not populated; domain DNS SPF/DKIM records for `codeverse.digital` are pending in Resend dashboard. Automated Test #15 confirms honest 503 response.
+* **Recommended Action**: Founder creates a Resend account, adds `codeverse.digital`, configures SPF/DKIM/DMARC DNS records, and sets `RESEND_API_KEY`, `CONTACT_RECIPIENT_EMAIL`, and `CONTACT_FROM_EMAIL` in Vercel Project Settings.
+* **Prevents Vercel Staging?**: **NO**. The application handles missing credentials gracefully with a 503 fallback and is fully testable on staging.
+* **Prevents Public Launch?**: **YES**. Public commercial traffic cannot launch without live client enquiry delivery.
 
-A client-facing digital technology studio cannot launch to public prospective international clients while its primary inbound project enquiry channel is in a mock/missing-configuration state.
+#### ISSUE-02: Local Git Commit Awaiting Initial Push to GitHub
+* **Severity**: **BLOCKER** (For Vercel Staging Import) / **RESOLVED LOCALLY**
+* **Impact**: The repository is fully staged and committed locally on `main` (`commit 0e63539`), but cannot be automatically imported by Vercel until pushed to `https://github.com/codeverseadmin/CODEVERSE_GLOBAL`.
+* **Evidence**: Windows Git Credential Manager (`credential.helper = manager`) requires interactive founder authentication for `codeverseadmin` to push over HTTPS.
+* **Recommended Action**: Founder runs `git push -u origin main` in `codeverse-web/` and authorizes via browser.
+* **Prevents Vercel Staging?**: **YES** (until pushed).
+* **Prevents Public Launch?**: **YES**.
 
-**Conditional Path to GO**:
-The application is in **CONDITIONAL GO** status for deployment to a private pre-production or staging environment. As soon as the founder completes the four manual activation steps in [`audit/CODEVERSE_LIVE_ACTIVATION_CHECKLIST.md`](file:///c:/Users/User/OneDrive/Desktop/CODEVERSE-GLOBAL/audit/CODEVERSE_LIVE_ACTIVATION_CHECKLIST.md) and verifies an authentic test enquiry delivery, the release status immediately transitions to **FULL GO**.
+---
+
+### 8.2 HIGH Issues
+
+#### ISSUE-03: Physical Hardware & Screen-Reader Visual Verification Pending
+* **Severity**: **HIGH** (For Public Launch) / **NON-BLOCKING** (For Vercel Staging)
+* **Impact**: While DOM semantics, ARIA attributes (`aria-hidden="true"` on honeypots), and color contrast ratios (6.03:1 canvas, 5.74:1 cards) are mathematically verified, subtle rendering bugs on iOS Safari or mobile Chrome could affect user experience.
+* **Evidence**: Playwright loopback testing was restricted by local container sandbox limits.
+* **Recommended Action**: Conduct visual and tactile smoke testing on physical iOS and Android hardware once deployed to the Vercel temporary URL.
+* **Prevents Vercel Staging?**: **NO**. Staging is the intended environment for cross-device review.
+* **Prevents Public Launch?**: **YES** (Pre-launch sign-off required).
+
+---
+
+### 8.3 MEDIUM Issues
+
+#### ISSUE-04: Serverless In-Memory Rate Limiting Isolation
+* **Severity**: **MEDIUM** (Operational Limitation)
+* **Impact**: The rate limiter uses an in-memory `Map`. On Vercel, serverless functions scale across multiple independent lambda instances. An in-memory Map only rate-limits requests hitting the same instance.
+* **Evidence**: `src/lib/utils/contact.ts` uses JavaScript `Map<string, ...>()`.
+* **Recommended Action**: For initial studio launch with low-to-medium traffic (<50 enquiries/day), the honeypot spam traps and edge proxy IP validation provide adequate protection. If high-concurrency bot traffic is detected, swap the storage adapter in `checkRateLimit()` with Upstash Redis (`@upstash/ratelimit`).
+* **Prevents Vercel Staging?**: **NO**.
+* **Prevents Public Launch?**: **NO** (Acceptable initial operational risk).
+
+#### ISSUE-05: Content Security Policy `'unsafe-inline'` Retention
+* **Severity**: **MEDIUM** (Security Trade-off)
+* **Impact**: The CSP retains `'unsafe-inline'` for `script-src` and `style-src`.
+* **Evidence**: `next.config.ts` line 30.
+* **Recommended Action**: Retained intentionally because Next.js App Router relies on inline hydration chunks (`self.__next_f.push(...)`) and JSON-LD schema tags for Static Site Generation (SSG). Enforcing nonces would disable SSG and force dynamic SSR on all 25 marketing pages. Compensating control: `connect-src 'self'` prevents external data exfiltration.
+* **Prevents Vercel Staging?**: **NO**.
+* **Prevents Public Launch?**: **NO** (Standard Next.js SSG pattern).
+
+---
+
+### 8.4 LOW Issues
+
+#### ISSUE-06: Transitive Dev-Dependency Vulnerabilities (npm audit)
+* **Severity**: **LOW** (Accepted Risk)
+* **Impact**: `npm audit` flags 7 vulnerabilities in `braces` (used by ESLint dev plugin) and `postcss` (bundled inside Next.js for build-time CSS compilation).
+* **Evidence**: `npm audit --json`. All 7 are transitive. `braces` is dev-only; `postcss` runs only during `next build` on trusted local CSS.
+* **Recommended Action**: Reject `npm audit fix --force` as it causes breaking major version changes to Next.js 15. Await upstream patch releases.
+* **Prevents Vercel Staging?**: **NO**.
+* **Prevents Public Launch?**: **NO**.
+
+#### ISSUE-07: Optional WhatsApp Direct Line Unconfigured
+* **Severity**: **LOW** (Branding)
+* **Impact**: If `NEXT_PUBLIC_WHATSAPP_NUMBER` is empty, the contact page automatically renders a "Rapid Response" fallback card linking to `/start-a-project`.
+* **Evidence**: `src/app/contact/page.tsx` line 125.
+* **Recommended Action**: Populate `NEXT_PUBLIC_WHATSAPP_NUMBER` if a business line is ready, or keep fallback card.
+* **Prevents Vercel Staging?**: **NO**.
+* **Prevents Public Launch?**: **NO**.
+
+---
+
+### 8.5 INFORMATIONAL Items
+
+#### ISSUE-08: Editorial Founder Emblem Card
+* **Severity**: **INFORMATIONAL**
+* **Impact**: Placeholder notices (`"Founder biography to be added"`) were replaced with a refined `CV` monogram emblem card and studio-focused copy.
+* **Evidence**: `src/components/home/FounderSection.tsx`.
+* **Recommended Action**: Founder may optionally approve personal biography and headshot photo, or retain current studio card.
+* **Prevents Vercel Staging?**: **NO**.
+* **Prevents Public Launch?**: **NO**.
+
+#### ISSUE-09: Dynamic Base URL Fallback on Vercel
+* **Severity**: **INFORMATIONAL**
+* **Impact**: `siteConfig.url` dynamically resolves to `https://${process.env.VERCEL_URL}` when `NEXT_PUBLIC_SITE_URL` is unset.
+* **Evidence**: `src/lib/data/site.ts` line 13.
+* **Recommended Action**: Allows Vercel preview URLs to function without canonical mismatch. When custom domain `codeverse.digital` is connected, set `NEXT_PUBLIC_SITE_URL=https://codeverse.digital`.
+* **Prevents Vercel Staging?**: **NO**.
+* **Prevents Public Launch?**: **NO**.
+
+---
+
+## 9. Final Verdict
+
+### Primary Verdict: **CONDITIONAL GO FOR VERCEL STAGING**
+
+**Justification**:
+1. All 18 automated tests pass.
+2. The production build compiles and prerenders 25/25 static pages without errors.
+3. TypeScript type check and ESLint report 0 errors and 0 warnings.
+4. Security headers, anti-spoofing rate limits, and honeypot spam protection are active.
+5. The repository is cleanly structured for Vercel deployment with zero exposed secrets.
+6. **Condition for Staging Import**: The founder must run `git push -u origin main` to push the verified local commit `0e63539` to GitHub so Vercel can import the repository.
+
+### Public Launch Verdict: **NO-GO** (Pending Production Email & Custom Domain DNS)
+
+**Justification**:
+Commercial public launch to prospective international clients remains blocked until:
+1. Resend sending domain `codeverse.digital` is verified via DNS (SPF, DKIM, DMARC).
+2. Live production credentials (`RESEND_API_KEY`) are configured in Vercel.
+3. An authorized test enquiry is submitted and confirmed received in the founder's inbox.
+4. Physical mobile device visual checks are completed.
